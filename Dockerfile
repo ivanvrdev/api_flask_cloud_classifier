@@ -1,12 +1,12 @@
-FROM alpine:3.16
-
-RUN apk add --no-cache python3-dev \
-    && pip3 install --upgrade pip
+FROM python:3.8-slim-buster
 
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt requirements.txt
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN pip3 install -r requirements.txt
 
-RUN pip3 --no-cache-dir install -r requirements.txt
+COPY . .
 
 CMD ["python3", "src/app.py"]
