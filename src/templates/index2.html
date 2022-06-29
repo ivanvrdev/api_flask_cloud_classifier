@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificador de nubes</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar bg-light">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Clasificador de cielo</span>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-sm-12">
+                <form action="#">
+                    <div class="mb-3">
+                        <label for="imagen" class="form-label">Subir imagen</label>
+                        <input class="form-control" type="file" id="imagen" name="imagen">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Clasificar</button>
+                </form>
+                <img src="#" alt="valor del input" id="preview" class="d-none mt-3" width="224" height="224">
+                <div class="alert mt-3 d-none" role="alert" id="alerta"></div>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script>
+        const form = document.forms[0]
+        const alerta = document.getElementById('alerta')
+        const preview = document.getElementById('preview')
+        const inputImagen = document.getElementById('imagen')
+        
+        const mostrarAlerta = (tipo, mensaje) =>{
+            alerta.classList.remove('d-none')
+            alerta.classList.add(tipo)
+            alerta.innerHTML = mensaje
+        }
+
+        inputImagen.addEventListener("change", () =>{
+            const file = inputImagen.files[0]
+
+            alerta.classList.add('d-none')
+            alerta.classList.remove('alert-warning', 'alert-info')
+            alerta.innerHTML = ""
+
+            if(file){
+                preview.src = URL.createObjectURL(file)
+                preview.classList.remove('d-none')
+            }else{
+                preview.classList.add('d-none')
+            }
+        })
+
+        form.addEventListener("submit", e =>{
+            e.preventDefault()
+
+            const fields = new FormData(form)
+            const file = inputImagen.files[0]
+
+            if(file){
+                fetch('/clasificar_cielo', {
+                    method: 'POST',
+                    body: fields
+                })
+                .then(data => data.json())
+                .then(data => mostrarAlerta('alert-info' ,data.mensaje))
+            }else{
+                mostrarAlerta('alert-warning', 'Debe seleccionar una imagen')
+            }
+        })
+
+
+    </script>
+</body>
+</html>
